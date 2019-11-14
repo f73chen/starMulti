@@ -1,6 +1,6 @@
 version 1.0
 
-workflow star {
+workflow starMulti {
 input {
  Array[Pair[Pair[File, File], String]]+ input_fqs_rgs
  String outputPrefix

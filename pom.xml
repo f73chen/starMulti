@@ -16,7 +16,7 @@
 
     <properties>
         <workflow-description>Workflow for aligning RNAseq reads.</workflow-description>
-	<wdl-workflow>star-multi.wdl</wdl-workflow>
+	<wdl-workflow>starMulti.wdl</wdl-workflow>
         <test-definition>tests.json</test-definition>
     </properties>
 
