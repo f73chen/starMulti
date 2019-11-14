@@ -6,6 +6,12 @@ input {
  String outputPrefix
 }
 
+scatter (fq_rg in input_fqs_rgs) {
+    File read1s    = fq_rg.left.left
+    File read2s    = fq_rg.left.right
+    String readgroups = fq_rg.right
+}
+
 call runStar { input: input_fqs_rgs = input_fqs_rgs, outputPrefix = outputPrefix }
 call indexBam { input: inputBam = runStar.outputBam }
 
@@ -41,27 +47,23 @@ input {
   Int uniqMAPQ = 255
   Int saSparsed = 2
   Int multiMax = -1
-  Int chimSegmin 12
-  Int chimJunOvMin 12
-  Int chimOutJunFor 1
-  Int alignSJDBOvMin 10
-  Int alignMatGapMax 100000
-  Int alignIntMax 100000
-  Int chimMulmapScoRan 3
-  Int chimScoJunNonGTAG -4
-  Int chimMulmapNmax 20
-  Int chimNonchimScoDMin 10
-  Int peOvNbasesMin 12
-  Float peOvMMp 0.1
+  Int chimSegmin = 12
+  Int chimJunOvMin = 12
+  Int chimOutJunFor = 1
+  Int alignSJDBOvMin = 10
+  Int alignMatGapMax = 100000
+  Int alignIntMax = 100000
+  Int chimMulmapScoRan = 3
+  Int chimScoJunNonGTAG = -4
+  Int chimMulmapNmax = 20
+  Int chimNonchimScoDMin = 10
+  Int peOvNbasesMin = 12
+  Float peOvMMp = 0.1
   Int threads = 6
-  Int jobMemory  = 36
+  Int jobMemory = 36
 }
 
-scatter (fq_rg in input_fqs_rgs) {
-    read1s    = fq_rg.left.left
-    read2s    = fq_rg.left.right
-    readgroups = fq_rg.right
-}
+
 
 parameter_meta {
  input_fqs_rgs: "Array pairs of fastqs pairs and the associated read group"
