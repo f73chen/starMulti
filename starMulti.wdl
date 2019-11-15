@@ -12,7 +12,7 @@ scatter (fq_rg in input_fqs_rgs) {
     String readgroups = fq_rg.right
 }
 
-call runStar { input: input_fqs_rgs = input_fqs_rgs, outputPrefix = outputPrefix }
+call runStar { input: read1s = read1s, read2s = read2s, readgroups = readgroups, outputPrefix = outputPrefix }
 call indexBam { input: inputBam = runStar.outputBam }
 
 meta {
@@ -35,7 +35,9 @@ output {
 # ==========================================
 task runStar {
 input {
-  Array[Pair[Pair[File, File], String]]+ input_fqs_rgs
+  Array[File]+ read1s
+  Array[File]+ read2s
+  Array[String]+ readgroups
   String genome_index_dir = "$HG38_STAR_INDEX100_ROOT/"
   String outputPrefix
   String starSuffix = "Aligned.sortedByCoord.out"
@@ -60,15 +62,13 @@ input {
   Int peOvNbasesMin = 12
   Float peOvMMp = 0.1
   Int threads = 6
-  Int jobMemory = 36
+  Int jobMemory = 64
 }
 
-
-
 parameter_meta {
- input_fqs_rgs: "Array pairs of fastqs pairs and the associated read group"
- genome_index_dir: "Directory with indices for STAR"
- outputPrefix: "Prefix for building output file name"
+ read1s: "array of read1s"
+ read2s: "array of read2s"
+ readgroups: "array of readgroup lines"
  starSuffix: "Suffix for sorted file"
  transcriptomeSuffix: "Suffix for transcriptome-aligned file"
  chimericjunctionSuffix: "Suffix for chimeric junction file"
@@ -98,12 +98,12 @@ parameter_meta {
 command <<<
  STAR --twopassMode Basic \
       --genomeDir ~{genome_index_dir} \
-      --readFilesIn ~${sep="," read1s} ~${sep="," read2s} \
+      --readFilesIn ~{sep="," read1s} ~{sep="," read2s} \
       --readFilesCommand zcat \
       --outFilterIntronMotifs RemoveNoncanonical \
-      --outFileNamePrefix ~{outputPrefix} \
+      --outFileNamePrefix ~{outputPrefix}. \
       --outSAMmultNmax ~{multiMax} \
-      --outSAMattrRGline ~${sep=" , " readgroups} \
+      --outSAMattrRGline ~{sep=" , " readgroups} \
       --outSAMstrandField intronMotif \
       --outSAMmapqUnique  ~{uniqMAPQ} \
       --outSAMunmapped Within KeepPairs \
@@ -134,10 +134,10 @@ runtime {
 
 
 output {
- File outputBam        = "~{outputPrefix}~{starSuffix}.bam"
- File outputChimeric   = "~{outputPrefix}~{chimericjunctionSuffix}.junction"
- File transcriptomeBam = "~{outputPrefix}~{transcriptomeSuffix}.bam"
- File geneReads        = "~{outputPrefix}~{genereadSuffix}.tab"
+ File outputBam        = "~{outputPrefix}.~{starSuffix}.bam"
+ File outputChimeric   = "~{outputPrefix}.~{chimericjunctionSuffix}.junction"
+ File transcriptomeBam = "~{outputPrefix}.~{transcriptomeSuffix}.bam"
+ File geneReads        = "~{outputPrefix}.~{genereadSuffix}.tab"
 }
 }
 
