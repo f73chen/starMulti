@@ -44,7 +44,7 @@ input {
   String transcriptomeSuffix = "Aligned.toTranscriptome.out"
   String chimericjunctionSuffix = "Chimeric.out"
   String genereadSuffix = "ReadsPerGene.out"
-  String? addParam = ""
+  String? addParam
   String modules = "star/2.7.3a hg38-star-index100/2.7.3a"
   Int uniqMAPQ = 255
   Int saSparsed = 2
@@ -123,7 +123,7 @@ command <<<
       --chimNonchimScoreDropMin ~{chimNonchimScoDMin} \
       --peOverlapNbasesMin ~{peOvNbasesMin} \
       --peOverlapMMp ~{peOvMMp} \
-      --runThreadN ~{threads}
+      --runThreadN ~{threads} ~{addParam}
 >>>
 
 runtime {
