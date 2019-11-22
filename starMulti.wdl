@@ -2,23 +2,33 @@ version 1.0
 
 workflow starMulti {
 input {
- Array[Pair[Pair[File, File], String]]+ input_fqs_rgs
- String outputPrefix
+ Array[Pair[Pair[File, File], String]]+ inputFqsRgs
+ String outputFileNamePrefix
 }
 
-scatter (fq_rg in input_fqs_rgs) {
+scatter (fq_rg in inputFqsRgs) {
     File read1s    = fq_rg.left.left
     File read2s    = fq_rg.left.right
     String readgroups = fq_rg.right
 }
 
-call runStar { input: read1s = read1s, read2s = read2s, readgroups = readgroups, outputPrefix = outputPrefix }
+call runStar { input: read1s = read1s, read2s = read2s, readgroups = readgroups, outputFileNamePrefix = outputFileNamePrefix }
 call indexBam { input: inputBam = runStar.outputBam }
 
 meta {
  author: "Peter Ruzanov & Jonathon Torchia"
  email: "peter.ruzanov@oicr.on.ca"
- description: "STAR-Multi 1.0"
+ description: "starMulti 1.0"
+ dependencies: [
+      {
+        name: "star/2.7.3a",
+        url: "https://github.com/alexdobin/STAR"
+      },
+      {
+        name: "picard/2.19.2",
+        url: "https://broadinstitute.github.io/picard/"
+      }
+    ]
 }
 
 output {
@@ -39,7 +49,7 @@ input {
   Array[File]+ read2s
   Array[String]+ readgroups
   String genome_index_dir = "$HG38_STAR_INDEX100_ROOT/"
-  String outputPrefix
+  String outputFileNamePrefix
   String starSuffix = "Aligned.sortedByCoord.out"
   String transcriptomeSuffix = "Aligned.toTranscriptome.out"
   String chimericjunctionSuffix = "Chimeric.out"
@@ -101,7 +111,7 @@ command <<<
       --readFilesIn ~{sep="," read1s} ~{sep="," read2s} \
       --readFilesCommand zcat \
       --outFilterIntronMotifs RemoveNoncanonical \
-      --outFileNamePrefix ~{outputPrefix}. \
+      --outFileNamePrefix ~{outputFileNamePrefix}. \
       --outSAMmultNmax ~{multiMax} \
       --outSAMattrRGline ~{sep=" , " readgroups} \
       --outSAMstrandField intronMotif \
@@ -134,10 +144,10 @@ runtime {
 
 
 output {
- File outputBam        = "~{outputPrefix}.~{starSuffix}.bam"
- File outputChimeric   = "~{outputPrefix}.~{chimericjunctionSuffix}.junction"
- File transcriptomeBam = "~{outputPrefix}.~{transcriptomeSuffix}.bam"
- File geneReads        = "~{outputPrefix}.~{genereadSuffix}.tab"
+ File outputBam        = "~{outputFileNamePrefix}.~{starSuffix}.bam"
+ File outputChimeric   = "~{outputFileNamePrefix}.~{chimericjunctionSuffix}.junction"
+ File transcriptomeBam = "~{outputFileNamePrefix}.~{transcriptomeSuffix}.bam"
+ File geneReads        = "~{outputFileNamePrefix}.~{genereadSuffix}.tab"
 }
 }
 
@@ -147,7 +157,7 @@ output {
 task indexBam {
 input {
 	File   inputBam
-  Int?   jobMemory  = 12
+  Int   jobMemory  = 12
   String? modules = "java/8 picard/2.19.2" 
 }
 
