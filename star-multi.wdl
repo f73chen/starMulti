@@ -41,18 +41,18 @@ input {
   Int uniqMAPQ = 255
   Int saSparsed = 2
   Int multiMax = -1
-  Int chimSegmin 12
-  Int chimJunOvMin 12
-  Int chimOutJunFor 1
-  Int alignSJDBOvMin 10
-  Int alignMatGapMax 100000
-  Int alignIntMax 100000
-  Int chimMulmapScoRan 3
-  Int chimScoJunNonGTAG -4
-  Int chimMulmapNmax 20
-  Int chimNonchimScoDMin 10
-  Int peOvNbasesMin 12
-  Float peOvMMp 0.1
+  Int chimSegmin = 12
+  Int chimJunOvMin = 12
+  Int chimOutJunFor = 1
+  Int alignSJDBOvMin = 10
+  Int alignMatGapMax = 100000
+  Int alignIntMax = 100000
+  Int chimMulmapScoRan = 3
+  Int chimScoJunNonGTAG = -4
+  Int chimMulmapNmax = 20
+  Int chimNonchimScoDMin = 10
+  Int peOvNbasesMin = 12
+  Float peOvMMp = 0.1
   Int threads = 6
   Int jobMemory  = 36
 }
